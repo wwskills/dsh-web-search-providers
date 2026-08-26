@@ -7,7 +7,7 @@ Web search providers for [DeepSeek Harness](https://github.com/deepseek-ai/dsh).
 | Provider | ID | Description |
 |----------|----|-------------|
 | **Tavily** | `tavily` | AI-optimized web search API |
-| **Baidu** | `baidu` | Baidu search API |
+| **Baidu** | `baidu` | Baidu AI Open Platform search |
 
 ## Installation
 
@@ -32,41 +32,38 @@ Add to your profile's `package.json` bundles:
 
 ## Configuration
 
-Configure via DSH Settings UI → Plugins → 网络搜索.
+### 1. Set Environment Variable
 
-### Tavily
+DSH needs to know which search provider to use. Set this before starting DSH:
 
-```yaml
-provider: tavily
-tavily:
-  api_key: tvly-xxx
-  max_results: 5
-  search_depth: basic  # or "advanced"
-```
-
-### Baidu
-
-```yaml
-provider: baidu
-baidu:
-  api_key: xxx
-  secret_key: xxx
-  endpoint: https://api.baidu.com/jsonapi
-```
-
-## Provider Selection
-
-DSH's `searchProvider` config selects which provider handles `web_search` calls. Only one provider can be active at a time.
-
-Set via environment variable:
 ```bash
+# In systemd override or environment
 export DSH_WEB_SEARCH_PROVIDER=tavily
 ```
 
-Or via DSH config:
-```yaml
-searchProvider: tavily
+Or via systemd:
+```bash
+sudo systemctl edit dsh
+# Add:
+# [Service]
+# Environment="DSH_WEB_SEARCH_PROVIDER=tavily"
 ```
+
+### 2. Configure via WebUI
+
+Go to **Settings → Plugins → 网络搜索** to configure:
+- Select active provider (Tavily / Baidu / None)
+- Enter API key
+- Test connection
+- Save
+
+### 3. Provider Switching
+
+Switching providers requires a DSH restart (DSH framework limitation). API key changes take effect immediately.
+
+### 4. Fallback to DeepSeek
+
+When `activeProvider` is set to `none`, no custom provider is registered, and DSH falls back to its built-in DeepSeek web search.
 
 ## License
 
