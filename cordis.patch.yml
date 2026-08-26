@@ -1,0 +1,27 @@
+# @wwskills/dsh-web-search-providers cordis patch
+#
+# Registers Tavily and Baidu search providers into DSH's web seam.
+# Users select which provider is active via DSH config or WebUI.
+
+- insert:
+    - id: web-search-providers
+      name: '@wwskills/dsh-web-search-providers'
+      config:
+        # Active provider selection: 'none' | 'tavily' | 'baidu'
+        activeProvider: 'none'
+
+        # Tavily config (https://tavily.com)
+        tavily:
+          apiKey: ''
+          baseURL: 'https://api.tavily.com'
+          maxResults: 5
+          searchDepth: 'basic'          # 'basic' | 'advanced'
+          timeoutMs: 30000
+
+        # Baidu config (Baidu AI Open Platform)
+        baidu:
+          apiKey: ''
+          secretKey: ''
+          endpoint: 'https://aip.baidubce.com'
+          maxResults: 5
+          timeoutMs: 30000

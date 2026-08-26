@@ -4,12 +4,28 @@
   "description": "Web search providers for DSH: Tavily + Baidu + extensible",
   "type": "module",
   "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "test": "node scripts/test-providers.js"
   },
   "keywords": ["dsh", "deepseek-harness", "web-search", "tavily", "baidu", "cordis"],
   "license": "MIT",
   "author": "wwskills",
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^0.1.0-rc.6",
+    "@deepseek-ai/schemastery": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-settings": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-web": "^0.1.0-rc.6",
+    "react": "^18.2.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/wwskills/dsh-web-search-providers.git"
@@ -26,9 +42,16 @@
     "CHANGELOG.md"
   ],
   "dsh": {
-    "profile": {
-      "bundles": [
-        "@wwskills/dsh-web-search-providers"
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-primitives"
       ]
     }
   }
