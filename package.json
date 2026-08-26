@@ -1,0 +1,35 @@
+{
+  "name": "@wwskills/dsh-web-search-providers",
+  "version": "0.1.0",
+  "description": "Web search providers for DSH: Tavily + Baidu + extensible",
+  "type": "module",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "node scripts/test-providers.js"
+  },
+  "keywords": ["dsh", "deepseek-harness", "web-search", "tavily", "baidu", "cordis"],
+  "license": "MIT",
+  "author": "wwskills",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wwskills/dsh-web-search-providers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wwskills/dsh-web-search-providers/issues"
+  },
+  "homepage": "https://github.com/wwskills/dsh-web-search-providers#readme",
+  "files": [
+    "lib/",
+    "migrations/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@wwskills/dsh-web-search-providers"
+      ]
+    }
+  }
+}
