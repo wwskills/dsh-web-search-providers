@@ -1,6 +1,6 @@
 {
   "name": "@wwskills/dsh-web-search-providers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Web search providers for DSH: Tavily + Baidu + extensible",
   "type": "module",
   "main": "lib/index.js",

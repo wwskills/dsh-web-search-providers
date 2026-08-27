@@ -2,7 +2,7 @@
 // Verifies provider class structure and available() logic
 
 import { TavilySearchProvider, TAVILY_PROVIDER_ID } from '../lib/tavily.js';
-import { BaiduSearchProvider, BAIDU_PROVIDER_ID } from '../lib/baidu.js';
+import { BaiduSearchProvider, BAIDU_PROVIDER_ID, BAIDU_DEFAULT_ENDPOINT } from '../lib/baidu.js';
 
 const PASS = '✅';
 const FAIL = '❌';
@@ -36,21 +36,18 @@ check('Tavily available with API key', tavilyWithKey.available() === true);
 // ── Baidu provider ──
 console.log('\n── Baidu Provider ──\n');
 
-const baiduNoKey = new BaiduSearchProvider(() => ({ apiKey: '', secretKey: '' }));
+const baiduNoKey = new BaiduSearchProvider(() => ({ apiKey: '' }));
 check('Baidu provider id', baiduNoKey.id === BAIDU_PROVIDER_ID, `id=${baiduNoKey.id}`);
-check('Baidu unavailable without keys', baiduNoKey.available() === false);
+check('Baidu unavailable without API key', baiduNoKey.available() === false);
 
-const baiduPartial = new BaiduSearchProvider(() => ({ apiKey: 'key', secretKey: '' }));
-check('Baidu unavailable with partial keys', baiduPartial.available() === false);
-
-const baiduWithKeys = new BaiduSearchProvider(() => ({
-  apiKey: 'test-key',
-  secretKey: 'test-secret',
-  endpoint: 'https://aip.baidubce.com',
+const baiduWithKey = new BaiduSearchProvider(() => ({
+  apiKey: 'bce-v3/test-key',
+  endpoint: BAIDU_DEFAULT_ENDPOINT,
   maxResults: 5,
   timeoutMs: 30000,
 }));
-check('Baidu available with both keys', baiduWithKeys.available() === true);
+check('Baidu available with API key', baiduWithKey.available() === true);
+check('Baidu default endpoint is Qianfan', BAIDU_DEFAULT_ENDPOINT === 'https://qianfan.baidubce.com', `endpoint=${BAIDU_DEFAULT_ENDPOINT}`);
 
 // ── Summary ──
 console.log('\n═══════════════════════════════════════════════════════');

@@ -1,9 +1,10 @@
 # @wwskills/dsh-web-search-providers cordis patch
 #
 # Registers Tavily and Baidu search providers into DSH's web seam.
-# 
+#
 # Provider selection: change 'activeProvider' below and restart DSH.
 # When 'none', DSH falls back to its built-in DeepSeek web search.
+# You can also switch providers at runtime via the Settings UI.
 
 - insert:
     - id: web-search-providers
@@ -20,7 +21,5 @@
 
         baidu:
           apiKey: ''
-          secretKey: ''
-          endpoint: 'https://aip.baidubce.com'
           maxResults: 5
           timeoutMs: 30000
