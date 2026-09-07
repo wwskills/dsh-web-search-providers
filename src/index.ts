@@ -14,7 +14,7 @@ import { join } from 'node:path'
 import { dataDirectory } from './config-path.js'
 import { TavilySearchProvider, TAVILY_PROVIDER_ID, TAVILY_DEFAULT_BASE_URL } from './tavily.js'
 import { BaiduSearchProvider, BAIDU_PROVIDER_ID, BAIDU_DEFAULT_ENDPOINT } from './baidu.js'
-import { getUsageSnapshot } from './usage.js'
+import { getUsageSnapshot, incrementUsage } from './usage.js'
 
 export const name = 'web-search-providers'
 export const inject = ['web', 'settings']
@@ -145,9 +145,26 @@ export function apply(ctx, config: Partial<PluginConfig> = {}): void {
 
   function createProvider(): unknown | null {
     const provider = state.activeProvider
-    if (provider === 'tavily') return new TavilySearchProvider(() => resolveOptions() as never)
-    if (provider === 'baidu') return new BaiduSearchProvider(() => resolveOptions() as never)
-    return null
+    let instance: { search: (req: unknown, sig?: AbortSignal) => Promise<unknown>; id: string } | null = null
+    if (provider === 'tavily') instance = new TavilySearchProvider(() => resolveOptions() as never) as never
+    if (provider === 'baidu') instance = new BaiduSearchProvider(() => resolveOptions() as never) as never
+    if (!instance) return null
+
+    // Wrap search() to track usage per call
+    const originalSearch = instance.search.bind(instance)
+    const providerId = instance.id
+    instance.search = async (req, sig) => {
+      try {
+        const result = await originalSearch(req, sig)
+        incrementUsage(providerId)
+        return result
+      } catch (error) {
+        // Still count the attempt (provider was called, even if it failed)
+        incrementUsage(providerId)
+        throw error
+      }
+    }
+    return instance
   }
 
   function registerActiveProvider(): void {
