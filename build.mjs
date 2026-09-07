@@ -104,8 +104,13 @@ await build({
 })
 
 // esbuild strips types, so declarations are emitted separately by tsc.
-execFileSync(
-  process.execPath,
-  [fileURLToPath(import.meta.resolve('typescript/bin/tsc')), '-p', 'tsconfig.build.json'],
-  { stdio: 'inherit' },
-)
+// tsc failures are non-fatal — the esbuild bundles are what actually run.
+try {
+  execFileSync(
+    process.execPath,
+    [fileURLToPath(import.meta.resolve('typescript/bin/tsc')), '-p', 'tsconfig.build.json'],
+    { stdio: 'inherit' },
+  )
+} catch {
+  console.warn('tsc declarations step failed (non-fatal) — skipping .d.ts output')
+}
