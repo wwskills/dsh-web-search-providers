@@ -13,7 +13,7 @@ import {
   WEB_PROVIDER_ERROR,
 } from './types.js'
 import type { SearchRequest, SearchResponse, WebSearchProvider } from './types.js'
-import { fetchWithTimeout, buildAbortSignal, isAbortError } from './http-util.js'
+import { buildAbortSignal, isAbortError } from './http-util.js'
 
 export const TAVILY_PROVIDER_ID = 'tavily'
 export const TAVILY_DEFAULT_BASE_URL = 'https://api.tavily.com'
@@ -78,7 +78,7 @@ export class TavilySearchProvider implements WebSearchProvider {
     }
 
     try {
-      const response = await fetchWithTimeout(`${baseURL}/search`, {
+      const response = await fetch(`${baseURL}/search`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),

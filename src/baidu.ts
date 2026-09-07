@@ -14,7 +14,7 @@ import {
   WEB_PROVIDER_ERROR,
 } from './types.js'
 import type { SearchRequest, SearchResponse, WebSearchProvider } from './types.js'
-import { fetchWithTimeout, buildAbortSignal, isAbortError } from './http-util.js'
+import { buildAbortSignal, isAbortError } from './http-util.js'
 
 export const BAIDU_PROVIDER_ID = 'baidu'
 export const BAIDU_DEFAULT_ENDPOINT = 'https://qianfan.baidubce.com'
@@ -73,7 +73,7 @@ export class BaiduSearchProvider implements WebSearchProvider {
     }
 
     try {
-      const response = await fetchWithTimeout(`${endpoint}/v2/ai_search/web_search`, {
+      const response = await fetch(`${endpoint}/v2/ai_search/web_search`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',

@@ -4,11 +4,6 @@
  * @module @wwskills/dsh-web-search-providers/http-util
  */
 
-/** A `fetch`-style init that also carries our timeout signal. */
-export interface FetchRequestInit extends RequestInit {
-  signal?: AbortSignal
-}
-
 /**
  * Build a controller whose signal aborts on either the caller's `signal` or
  * the timeout, whichever fires first. Returns `AbortSignal.any` when available,
@@ -38,16 +33,4 @@ export function isAbortError(error: unknown): boolean {
     error instanceof Error
     && (error.name === 'AbortError' || (error as { code?: string }).code === 'ABORT_ERR')
   )
-}
-
-/**
- * `fetch` wrapper that merges an external `init.signal` with an explicit
- * timeout (applied via `buildAbortSignal`). Callers should pass the combined
- * signal through `init.signal`; this wrapper then delegates to `fetch`.
- *
- * The timeout itself is enforced by the signal — this function exists as a
- * single point where transport-level retry / logging could be added later.
- */
-export async function fetchWithTimeout(url: string, init: FetchRequestInit): Promise<Response> {
-  return fetch(url, init)
 }

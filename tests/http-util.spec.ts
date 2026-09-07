@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { buildAbortSignal, isAbortError, fetchWithTimeout } from '../src/http-util.js'
+import { buildAbortSignal, isAbortError } from '../src/http-util.js'
 
 describe('buildAbortSignal', () => {
   it('returns a fresh signal that is not aborted by default', () => {
@@ -31,15 +31,5 @@ describe('isAbortError', () => {
   it('rejects ordinary errors and non-errors', () => {
     expect(isAbortError(new Error('boom'))).toBe(false)
     expect(isAbortError('not an error')).toBe(false)
-  })
-})
-
-describe('fetchWithTimeout', () => {
-  it('passes through to fetch', async () => {
-    const mockFetch = vi.fn(async () => new Response('ok', { status: 200 }))
-    vi.stubGlobal('fetch', mockFetch)
-    const response = await fetchWithTimeout('https://example.test', { method: 'GET' })
-    expect(response).toBeInstanceOf(Response)
-    expect(mockFetch).toHaveBeenCalledWith('https://example.test', { method: 'GET' })
   })
 })

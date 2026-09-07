@@ -9,21 +9,7 @@
  */
 export declare const name = "web-search-providers";
 export declare const inject: string[];
-declare const Config: import("@deepseek-ai/schemastery").Schema<{
-    activeProvider: import("@deepseek-ai/schemastery").Schema<"baidu" | "none" | "tavily">;
-    tavily: import("@deepseek-ai/schemastery").Schema<{
-        apiKey: import("@deepseek-ai/schemastery").Schema<string>;
-        baseURL: import("@deepseek-ai/schemastery").Schema<string>;
-        maxResults: import("@deepseek-ai/schemastery").Schema<number>;
-        searchDepth: import("@deepseek-ai/schemastery").Schema<"basic" | "advanced">;
-        timeoutMs: import("@deepseek-ai/schemastery").Schema<number>;
-    }>;
-    baidu: import("@deepseek-ai/schemastery").Schema<{
-        apiKey: import("@deepseek-ai/schemastery").Schema<string>;
-        maxResults: import("@deepseek-ai/schemastery").Schema<number>;
-        timeoutMs: import("@deepseek-ai/schemastery").Schema<number>;
-    }>;
-}>;
+declare const Config: any;
 interface PluginConfig {
     activeProvider: 'none' | 'tavily' | 'baidu';
     tavily: {
