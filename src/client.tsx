@@ -91,7 +91,24 @@ const inputStyle: Record<string, string> = {
   width: '100%',
   boxSizing: 'border-box',
 }
-const selectStyle: Record<string, string> = { ...inputStyle, background: 'inherit' }
+const selectStyle: Record<string, string> = {
+  ...inputStyle,
+  background: 'var(--dsw-alias-bg-input)',
+  color: 'var(--dsw-alias-label-primary)',
+  colorScheme: 'dark',
+  cursor: 'pointer',
+  appearance: 'none',
+  WebkitAppearance: 'none',
+  MozAppearance: 'none',
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E")`,
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'right 12px center',
+  paddingRight: '32px',
+}
+const optionStyle: Record<string, string> = {
+  background: 'var(--dsw-alias-bg-layer-2)',
+  color: 'var(--dsw-alias-label-primary)',
+}
 const btnPrimary: Record<string, string> = {
   height: '36px',
   padding: '0 20px',
@@ -153,7 +170,7 @@ const zh: Locale = {
   baidu: 'Baidu',
   none: '不使用',
   statusEnabled: '已启用',
-  statusDisabled: '未启用',
+  statusDisabled: '已停用',
   apiKey: 'API Key',
   apiKeyHint: 'Tavily API 密钥，以 tvly- 开头',
   baiduApiKeyHint: '千帆平台 API Key',
@@ -296,17 +313,33 @@ function SettingsTab(props: { t: (key: string) => string }): ReactElement {
   const providerUsage = isEnabled && usage?.providers?.[cfg.activeProvider]
 
   const statusPill = (
-    <span style={{
-      fontSize: '12px',
-      border: `1px solid ${isEnabled ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-border-l2)'}`,
-      background: isEnabled ? 'var(--dsw-alias-state-success-primary)' : 'transparent',
-      color: isEnabled ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-label-tertiary)',
-      borderRadius: '12px',
-      padding: '1px 10px',
-      whiteSpace: 'nowrap',
-      opacity: isEnabled ? 1 : 0.5,
-    }}>
-      {isEnabled ? `● ${t('statusEnabled')}` : `○ ${t('statusDisabled')}`}
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+      {isEnabled && (
+        <span style={{
+          display: 'inline-block',
+          width: '6px',
+          height: '6px',
+          borderRadius: '50%',
+          background: 'var(--dsw-alias-state-success-primary)',
+          flexShrink: 0,
+        }} />
+      )}
+      <span style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        height: '32px',
+        padding: '0 10px',
+        border: 'none',
+        borderRadius: '8px',
+        fontSize: '12px',
+        fontWeight: 500,
+        lineHeight: '18px',
+        whiteSpace: 'nowrap',
+        background: isEnabled ? 'var(--dsw-alias-state-success-tertiary)' : 'transparent',
+        color: isEnabled ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-label-tertiary)',
+      }}>
+        {isEnabled ? t('statusEnabled') : t('statusDisabled')}
+      </span>
     </span>
   )
 
@@ -371,9 +404,9 @@ function SettingsTab(props: { t: (key: string) => string }): ReactElement {
         </div>
         <div style={{ marginTop: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
           <select value={cfg.activeProvider} onChange={e => update('activeProvider', e.target.value)} style={{ ...selectStyle, maxWidth: '240px' }}>
-            <option value="none">{t('none')}</option>
-            <option value="tavily">{t('tavily')}</option>
-            <option value="baidu">{t('baidu')}</option>
+            <option value="none" style={optionStyle}>{t('none')}</option>
+            <option value="tavily" style={optionStyle}>{t('tavily')}</option>
+            <option value="baidu" style={optionStyle}>{t('baidu')}</option>
           </select>
           {providerUsage && (
             <span style={{ fontSize: '12px', color: 'var(--dsw-alias-label-tertiary)', whiteSpace: 'nowrap' }}>
