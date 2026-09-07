@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `ds`-standard scripts: `typecheck`, `build`, `check` (typecheck + test + build)
-- `vitest` tests: 27 tests across 4 modules (baidu, tavily, usage, http-util)
+- `vitest` tests: 26 tests across 4 modules (baidu, tavily, usage, http-util)
 
 ### Fixed
 
@@ -43,7 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `incrementUsage` wired into every provider search call
 - WebUI: dropdown dark theme support (`colorScheme: dark` + custom SVG arrow)
 - WebUI: status indicator matches DSH native `_indicator` component style
-- WebUI: `fetchWithTimeout` documentation and test mocks
 
 ## [0.2.0] - 2026-08-27
 

@@ -15,15 +15,15 @@ The plugin is written in strict TypeScript and emits host ESM bundles plus a
 browser client bundle via esbuild, mirroring the DSH plugin engineering standard.
 
 ```bash
-pnpm install
-pnpm run typecheck   # tsc --noEmit
-pnpm test            # vitest run
-pnpm run build       # esbuild host + client, then tsc declarations
+npm install
+npm run typecheck   # tsc --noEmit
+npm test            # vitest run
+npm run build       # esbuild host + client, then tsc declarations
 ```
 
 Source lives in `src/` (`index.ts` entry, `tavily.ts` / `baidu.ts` providers,
-`usage.ts` quota tracking, `config-path.ts` cross-platform data dir) and the
-browser panel in `src/client.tsx`. Tests live in `tests/` and cover provider
+`usage.ts` quota tracking, `config-path.ts` cross-platform data dir, `http-util.ts`
+shared helpers) and the browser panel in `src/client.tsx`. Tests live in `tests/` and cover provider
 availability, response normalization, error classification, timeout/abort
 handling, usage persistence, and the Windows-safe path resolver.
 
@@ -31,7 +31,7 @@ handling, usage persistence, and the Windows-safe path resolver.
 
 ```bash
 # In your DSH profile directory
-pnpm add @wwskills/dsh-web-search-providers
+npm add @wwskills/dsh-web-search-providers
 ```
 
 Add to your profile's `package.json` bundles:
