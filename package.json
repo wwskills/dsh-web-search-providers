@@ -1,6 +1,6 @@
 {
   "name": "@wwskills/dsh-web-search-providers",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Web search providers for DSH: Tavily + Baidu + extensible",
   "type": "module",
   "main": "lib/index.js",
@@ -24,7 +24,14 @@
     "prepack": "node build.mjs",
     "prepare": "node build.mjs"
   },
-  "keywords": ["dsh", "deepseek-harness", "web-search", "tavily", "baidu", "cordis"],
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "web-search",
+    "tavily",
+    "baidu",
+    "cordis"
+  ],
   "license": "MIT",
   "author": "wwskills",
   "peerDependencies": {
