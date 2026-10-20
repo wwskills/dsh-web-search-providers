@@ -8,5 +8,6 @@
     "rootDir": "src",
     "declarationDir": "lib/types"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/client.tsx"]
 }

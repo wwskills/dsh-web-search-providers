@@ -1,31 +1,48 @@
 /**
- * Plugin entry point: registers Tavily and Baidu providers into DSH's web seam.
+ * Plugin entry point: registers a Tavily or Baidu provider into DSH's web seam.
  *
- * Only the selected provider is registered at a time. When `activeProvider` is
- * `none`, no custom provider is registered and DSH falls back to its built-in
- * DeepSeek web search. Switching providers disposes the old one and registers
- * the new one live (no restart).
+ * Rewritten for DSH 0.2.x. Differences from the 0.1.x generation:
+ * - Config is declared by exporting `Config`; DSH projects it into Settings by
+ *   itself. `settings.register()` no longer exists.
+ * - `web` is a declared inject, so `ctx.web` is available directly.
+ * - Provider selection is owned by the seam: pin an id with the `web` row's
+ *   `searchProvider` config or `$DSH_WEB_SEARCH_PROVIDER`. Nothing here assigns
+ *   `searchProviderId` any more.
+ * - The settings panel and its HTTP routes were removed together with the client
+ *   bundle; usage counters remain, persisted to the plugin data directory.
+ *
+ * Only the configured provider registers. When `activeProvider` is `none`, DSH
+ * falls back to its built-in DeepSeek search.
  * @module @wwskills/dsh-web-search-providers/index
  */
+import Schema from '@deepseek-ai/schemastery';
 export declare const name = "web-search-providers";
 export declare const inject: string[];
-declare const Config: any;
-interface PluginConfig {
-    activeProvider: 'none' | 'tavily' | 'baidu';
-    tavily: {
-        apiKey: string;
-        baseURL: string;
-        maxResults: number;
-        searchDepth: 'basic' | 'advanced';
-        timeoutMs: number;
-    };
-    baidu: {
-        apiKey: string;
-        maxResults: number;
-        timeoutMs: number;
-    };
-}
-export declare function apply(ctx: any, config?: Partial<PluginConfig>): void;
-export { Config };
+/** Config schema. DSH validates the row's config against it and renders the form. */
+export declare const Config: Schema<Schemastery.ObjectS<NoInfer<{
+    activeProvider: Schema<string, string, "defined">;
+    tavilyApiKey: Schema<string, string, "defined">;
+    tavilyBaseURL: Schema<string, string, "defined">;
+    tavilyMaxResults: Schema<number, number, "defined">;
+    tavilySearchDepth: Schema<string, string, "defined">;
+    baiduApiKey: Schema<string, string, "defined">;
+    baiduMaxResults: Schema<number, number, "defined">;
+    timeoutMs: Schema<number, number, "defined">;
+}>>, Schemastery.ObjectT<NoInfer<{
+    activeProvider: Schema<string, string, "defined">;
+    tavilyApiKey: Schema<string, string, "defined">;
+    tavilyBaseURL: Schema<string, string, "defined">;
+    tavilyMaxResults: Schema<number, number, "defined">;
+    tavilySearchDepth: Schema<string, string, "defined">;
+    baiduApiKey: Schema<string, string, "defined">;
+    baiduMaxResults: Schema<number, number, "defined">;
+    timeoutMs: Schema<number, number, "defined">;
+}>>, "plain">;
+/**
+ * Register the configured provider.
+ * @param ctx - plugin context; `web` is injected.
+ * @param config - the row's config cells.
+ */
+export declare function apply(ctx: any, config?: any): void;
 export default apply;
 //# sourceMappingURL=index.d.ts.map

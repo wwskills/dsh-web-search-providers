@@ -44,7 +44,8 @@ describe('usage tracking', () => {
 describe('dataDirectory cross-platform resolution', () => {
   it('honours DSH_HOME when set (Windows-safe, no /root collapse)', () => {
     process.env.DSH_HOME = 'C:/Users/tester/.dsh'
-    expect(dataDirectory()).toBe('C:/Users/tester/.dsh/web-search-providers')
+    // node:path.join emits the platform separator, so compare normalized.
+    expect(dataDirectory().replace(/\\/g, '/')).toBe('C:/Users/tester/.dsh/web-search-providers')
     delete process.env.DSH_HOME
   })
 

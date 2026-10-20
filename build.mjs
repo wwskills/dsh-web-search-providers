@@ -1,14 +1,12 @@
 /**
  * Build pipeline for @wwskills/dsh-web-search-providers.
  *
- * Emits three host ESM bundles (loader shim, provider entry, client entry) and
- * the browser client bundle. On the host side the DSH/cordis peer packages stay
- * external — the DSH profile's node_modules provides them at runtime; schemastery
- * is inlined so the Loader validates plugin Config against it.
+ * Emits one host ESM bundle. DSH 0.2.x projects the exported `Config` schema
+ * into Settings itself, so the 0.1.x settings panel and its browser client
+ * bundle are gone: this is a Host-only plugin now.
  *
- * The client bundle is emitted as a classic factory script that registers itself
- * through `window.__ModuleLoader__.load({ id, factory })` and pulls its platform
- * peers (react, cordis, UI packages) from the injected `require`.
+ * The DSH/cordis peer packages stay external — the DSH profile's node_modules
+ * provides them at runtime.
  */
 import { build } from 'esbuild'
 import { mkdirSync } from 'node:fs'
@@ -67,41 +65,6 @@ for (const [entry, outfile] of hostEntries) {
   })
   await stripMachinePaths(outfile)
 }
-
-// Client side: modules the shell shares through the frozen client module table.
-const clientExternal = [
-  'react',
-  'react/jsx-runtime',
-  'react-dom',
-  'react-dom/client',
-  '@deepseek-ai/cordis',
-  '@deepseek-ai/dsh-client-ui-slots',
-  '@deepseek-ai/dsh-client-locale',
-  '@deepseek-ai/dsh-client-runtime',
-]
-
-await build({
-  entryPoints: ['src/client.tsx'],
-  outfile: 'lib/client.js',
-  bundle: true,
-  format: 'cjs',
-  platform: 'browser',
-  target: ['es2020'],
-  sourcemap: true,
-  jsx: 'automatic',
-  external: clientExternal,
-  define: {
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV ?? 'production'),
-    'import.meta.env': JSON.stringify({ MODE: process.env.NODE_ENV ?? 'production' }),
-  },
-  banner: {
-    js: `window.__ModuleLoader__.load({ id: ${JSON.stringify(PACKAGE_ID)}, factory: (require) => {\nvar module = { exports: {} };\n`,
-  },
-  footer: {
-    js: 'return module.exports; } });',
-  },
-  logLevel: 'info',
-})
 
 // esbuild strips types, so declarations are emitted separately by tsc.
 // tsc failures are non-fatal — the esbuild bundles are what actually run.
