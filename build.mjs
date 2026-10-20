@@ -66,6 +66,40 @@ for (const [entry, outfile] of hostEntries) {
   await stripMachinePaths(outfile)
 }
 
+// Client side: modules the shell shares through the frozen client module table.
+const clientExternal = [
+  'react',
+  'react/jsx-runtime',
+  'react-dom',
+  'react-dom/client',
+  '@deepseek-ai/cordis',
+  '@deepseek-ai/dsh-client-ui-slots',
+  '@deepseek-ai/dsh-client-locale',
+  '@deepseek-ai/dsh-client-ui-plugin-manager',
+]
+
+await build({
+  entryPoints: ['src/client.tsx'],
+  outfile: 'lib/client.js',
+  bundle: true,
+  format: 'cjs',
+  platform: 'browser',
+  target: ['es2020'],
+  sourcemap: true,
+  jsx: 'automatic',
+  external: clientExternal,
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV ?? 'production'),
+  },
+  banner: {
+    js: `window.__ModuleLoader__.load({ id: ${JSON.stringify(PACKAGE_ID)}, factory: (require) => {\nvar module = { exports: {} };\n`,
+  },
+  footer: {
+    js: 'return module.exports; } });',
+  },
+  logLevel: 'info',
+})
+
 // esbuild strips types, so declarations are emitted separately by tsc.
 // tsc failures are non-fatal — the esbuild bundles are what actually run.
 try {
