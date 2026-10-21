@@ -3,9 +3,18 @@
 Web search providers for [DeepSeek Harness](https://github.com/deepseek-ai/dsh).
 Provides alternative search engines for DSH's built-in `web_search` tool.
 
-Built and verified against **DSH 0.2.1-rc.2**. The plugin declares
-`@deepseek-ai/dsh-web@0.2.1-rc.2` as a peer dependency, so a mismatched runtime
-fails at install time rather than silently misbehaving.
+Built and verified against **DSH 0.2.1-rc.2**. The package declares that version
+in `engines.dsh`, which is the field DSH checks before importing plugin code, so
+an incompatible host refuses the install instead of misbehaving silently.
+
+DSH evaluates `engines.dsh` first; when it is present the `@deepseek-ai/dsh-*`
+peer ranges are ignored for compatibility purposes. The peer on
+`@deepseek-ai/dsh-web` is still declared, because it documents which seam the
+plugin was built against.
+
+> `dsh.manifestVersion` and `engines.dsh` are advisory metadata for tooling and
+> the plugin market; enforcement happens at install and profile start, against
+> the version reported by `dsh --version`.
 
 ## Supported Providers
 
@@ -16,6 +25,21 @@ fails at install time rather than silently misbehaving.
 
 Free-tier figures come from each provider's own console and change without
 notice — check the provider's dashboard for current allowances.
+
+## Compatibility
+
+| Requirement | Value |
+|-------------|-------|
+| DSH | `0.2.1-rc.2` (declared in `engines.dsh`) |
+| Node.js | `>=24` (declared in `engines.node`) |
+
+DSH checks `engines.dsh` against the version reported by `dsh --version` before
+importing plugin code. If the range is not met, installation is refused with an
+`incompatible-version` error naming the unmet requirement. An exact prerelease
+such as `0.2.1-rc.2` is a valid range and pins the plugin to that release;
+`~0.2.1-rc.2` or `>=0.2.1-rc.2 <0.3.0` accept compatible patch or prerelease
+updates. To run a plugin against an unverified DSH version you must grant an
+explicit per-version exemption, which DSH treats as an acknowledged risk.
 
 ## Development
 
@@ -28,6 +52,9 @@ npm run typecheck   # tsc --noEmit
 npm test            # vitest run
 npm run build       # esbuild host + client, then tsc declarations
 ```
+
+`pnpm-workspace.yaml` exists only to allow esbuild's install script under pnpm;
+npm does not read it.
 
 Source lives in `src/` (`index.ts` host entry, `client.tsx` browser panel,
 `tavily.ts` / `baidu.ts` providers, `types.ts` shared contracts, `usage.ts`

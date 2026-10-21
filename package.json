@@ -3,6 +3,10 @@
   "version": "0.4.0",
   "description": "Web search providers for DSH: Tavily + Baidu + extensible",
   "icon": "icon.svg",
+  "engines": {
+    "node": ">=24",
+    "dsh": "0.2.1-rc.2"
+  },
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
@@ -59,6 +63,7 @@
     "CHANGELOG.md"
   ],
   "dsh": {
+    "manifestVersion": 1,
     "bundle": {
       "patch": "./cordis.patch.yml"
     },
@@ -67,9 +72,7 @@
       "immediately": true,
       "inject": [
         "@deepseek-ai/dsh-client-locale",
-        "@deepseek-ai/dsh-client-ui-slots",
-        "@deepseek-ai/dsh-client-ui-primitives",
-        "@deepseek-ai/dsh-client-ui-plugin-manager"
+        "@deepseek-ai/dsh-client-ui-slots"
       ]
     }
   }

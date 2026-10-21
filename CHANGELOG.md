@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `engines.dsh: "0.2.1-rc.2"` and `dsh.manifestVersion: 1`, declaring the
+  DSH version this plugin supports. `engines.dsh` is the field DSH checks at
+  install and profile start, so an incompatible host refuses the plugin instead
+  of loading code written against a different seam.
 - `locale/en.json` and `locale/zh.json` supply the plugin title and description
   that Plugin Manager and Settings read, so the bundle shows as
   "Web Search" / "网络搜索" rather than the package name.
