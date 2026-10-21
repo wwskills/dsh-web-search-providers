@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-10-21
+
+### Changed
+
+- **DSH 0.2.1-rc.2 port.** `settings.register()` and the
+  `internal/service` event are gone; config is now declared by exporting
+  `Config` and projected into Settings by DSH itself.
+- Panel styling rewritten against the built-in Web Search page, read from the
+  DSH install rather than guessed: `0.5px` borders with `radius-md`, 34px
+  controls, `:focus-visible` with `state-business-primary`, and a filled
+  primary save button. Scoped CSS now uses the official `data-plugin-css`
+  injection pattern.
+- Replaced the native `<select>` with a button + listbox. The OS draws the
+  native popup, so its option hover colour cannot be themed; the custom control
+  uses `interactive-bg-hover` like DSH's own menus.
+- Panel copy moved out of markup into an `en`/`zh` dictionary routed through
+  `ctx.locale`, with an offline fallback for when the locale service has not
+  registered yet.
+
+### Added
+
+- `locale/en.json` and `locale/zh.json` supply the plugin title and description
+  that Plugin Manager and Settings read, so the bundle shows as
+  "Web Search" / "网络搜索" rather than the package name.
+- `icon.svg` reproduces the built-in `PluginArtworkSearch` artwork. DSH colours
+  its ring with a `foreignObject` conic-gradient, which renders blank when the
+  icon loads as an `<img>`, so the four arcs carry the equivalent solid colours.
+- API-key guidance links under each provider's field.
+
+### Fixed
+
+- **Provider switching now works.** The seam resolves `searchProvider` before
+  anything else, so the patch's static pin left the panel unable to switch:
+  activating a second provider made the seam look for an id nobody registered
+  and fail with `configured web provider "tavily" is not registered`. The plugin
+  now pins the seam to whichever provider it just registered, writing the
+  volatile cell through the shared `Symbol.for('cosmokit.volatile.write')`
+  handle from inside the `ctx.inject` callback — the only point where the `web`
+  service is guaranteed live, since `ctx.get('web')` returns `undefined` during
+  `apply()`.
+- Saving from the panel no longer reverts a provider switch. The save route
+  merged the patch over the *persisted* config, so the old `activeProvider`
+  overwrote the new one.
+- Testing a connection now uses the key currently in the form instead of the
+  last saved one, so an unsaved key can be checked before committing.
+- Usage counts survive an interrupted search.
+
+### Known limitations
+
+- The seam pin is written through the volatile reference, which is a
+  runtime-only change and is not persisted. Provider selection itself is
+  persisted by the plugin's own `user-config.json`, and the two realign on the
+  next start.
+
 ## [0.3.0] - 2026-09-07
 
 ### Changed

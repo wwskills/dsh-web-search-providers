@@ -1,9 +1,11 @@
 import { describe, expect, it, afterEach, vi } from 'vitest'
 import { BaiduSearchProvider, BAIDU_PROVIDER_ID, BAIDU_DEFAULT_ENDPOINT } from '../src/baidu.js'
+import type { BaiduOptions } from '../src/baidu.js'
 import { WebError, WEB_ABORTED, WEB_PROVIDER_CREDENTIAL_MISSING, WEB_PROVIDER_ERROR } from '../src/types.js'
+import type { WebSearchProvider } from '../src/types.js'
 
-const noKey = () => ({ apiKey: '' })
-const withKey = () => ({
+const noKey = (): BaiduOptions => ({ apiKey: '' })
+const withKey = (): BaiduOptions => ({
   apiKey: 'bce-v3/test-key',
   endpoint: BAIDU_DEFAULT_ENDPOINT,
   maxResults: 5,
@@ -12,6 +14,16 @@ const withKey = () => ({
 
 function mockFetch(status: number, body: unknown): void {
   vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(body), { status })))
+}
+
+/** Await a rejecting provider call and return the thrown `WebError`. */
+async function expectWebError(provider: WebSearchProvider, query: string): Promise<WebError> {
+  const error = await provider.search({ query }).then(
+    () => undefined,
+    (e: unknown) => e,
+  )
+  expect(error).toBeInstanceOf(WebError)
+  return error as WebError
 }
 
 describe('BaiduSearchProvider', () => {
@@ -29,7 +41,7 @@ describe('BaiduSearchProvider', () => {
   })
 
   it('throws a credential-missing error for an empty key', async () => {
-    const error = await new BaiduSearchProvider(noKey).search({ query: 'x' }).catch(e => e as WebError)
+    const error = await expectWebError(new BaiduSearchProvider(noKey), 'x')
     expect(error.code).toBe(WEB_PROVIDER_CREDENTIAL_MISSING)
   })
 
@@ -57,7 +69,7 @@ describe('BaiduSearchProvider', () => {
 
   it('classifies a non-OK response as provider error', async () => {
     mockFetch(401, 'unauthorized')
-    const error = await new BaiduSearchProvider(withKey).search({ query: 'x' }).catch(e => e as WebError)
+    const error = await expectWebError(new BaiduSearchProvider(withKey), 'x')
     expect(error.code).toBe(WEB_PROVIDER_ERROR)
     expect(error.message).toContain('HTTP 401')
   })
@@ -66,7 +78,7 @@ describe('BaiduSearchProvider', () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw Object.assign(new Error('aborted'), { name: 'AbortError' })
     }))
-    const error = await new BaiduSearchProvider(withKey).search({ query: 'x' }).catch(e => e as WebError)
+    const error = await expectWebError(new BaiduSearchProvider(withKey), 'x')
     expect(error.code).toBe(WEB_ABORTED)
   })
 
@@ -74,8 +86,7 @@ describe('BaiduSearchProvider', () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('ECONNREFUSED')
     }))
-    const error = await new BaiduSearchProvider(withKey).search({ query: 'x' }).catch(e => e as WebError)
-    expect(error).toBeInstanceOf(WebError)
+    const error = await expectWebError(new BaiduSearchProvider(withKey), 'x')
     expect(error.code).toBe(WEB_PROVIDER_ERROR)
   })
 })

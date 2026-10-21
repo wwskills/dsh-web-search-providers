@@ -1,13 +1,21 @@
 # @wwskills/dsh-web-search-providers
 
-Web search providers for [DeepSeek Harness](https://github.com/deepseek-ai/dsh). Provides alternative search engines for DSH's built-in `web_search` tool.
+Web search providers for [DeepSeek Harness](https://github.com/deepseek-ai/dsh).
+Provides alternative search engines for DSH's built-in `web_search` tool.
+
+Built and verified against **DSH 0.2.1-rc.2**. The plugin declares
+`@deepseek-ai/dsh-web@0.2.1-rc.2` as a peer dependency, so a mismatched runtime
+fails at install time rather than silently misbehaving.
 
 ## Supported Providers
 
 | Provider | ID | Auth | Free Tier |
 |----------|----|------|-----------|
 | **Tavily** | `tavily` | API Key | 1,000 calls/month |
-| **Baidu** | `baidu` | API Key (Bearer token) | 1,500 calls/month |
+| **Baidu** | `baidu` | API Key (Bearer token) | 1,500 calls/month, granted daily |
+
+Free-tier figures come from each provider's own console and change without
+notice — check the provider's dashboard for current allowances.
 
 ## Development
 
@@ -21,55 +29,67 @@ npm test            # vitest run
 npm run build       # esbuild host + client, then tsc declarations
 ```
 
-Source lives in `src/` (`index.ts` entry, `tavily.ts` / `baidu.ts` providers,
-`usage.ts` quota tracking, `config-path.ts` cross-platform data dir, `http-util.ts`
-shared helpers) and the browser panel in `src/client.tsx`. Tests live in `tests/` and cover provider
-availability, response normalization, error classification, timeout/abort
-handling, usage persistence, and the Windows-safe path resolver.
+Source lives in `src/` (`index.ts` host entry, `client.tsx` browser panel,
+`tavily.ts` / `baidu.ts` providers, `types.ts` shared contracts, `usage.ts`
+quota tracking, `config-path.ts` cross-platform data dir, `http-util.ts` shared
+helpers). Tests live in `tests/` and cover provider availability, response
+normalization, error classification, timeout/abort handling, usage persistence,
+and the Windows-safe path resolver.
 
 ## Installation
 
-```bash
-# In your DSH profile directory
-npm add @wwskills/dsh-web-search-providers
+Install it through DSH rather than by editing the profile by hand — DSH owns
+`package.json` and `cordis.patch.yml` in the profile directory, and writing
+those directly is unsupported.
+
+From an agent session, ask for the bundle install:
+
+```
+plugin_manager action=install_bundle target=D:\path\to\dsh-web-search-providers
 ```
 
-Add to your profile's `package.json` bundles:
+`install_bundle` performs the package installation and records the bundle
+selection. An agent can also pass `target=@wwskills/dsh-web-search-providers` once
+the package is published to a registry your profile can reach.
 
-```json
-{
-  "dsh": {
-    "profile": {
-      "bundles": [
-        "@wwskills/dsh-web-search-providers"
-      ]
-    }
-  }
-}
-```
+Both host and browser code load on the next DSH start, so restart afterwards to
+see the panel.
 
 ## Configuration
 
 ### Via WebUI
 
-Go to **Settings → Plugins → Web Search** to configure:
+Open **Settings → Plugins** and pick the search bundle. It appears as
+**网络搜索** in Chinese and **Web Search** in English; the title follows the
+interface language. Then:
 
-1. Select active provider (Tavily / Baidu / None)
-2. Enter API key (get free key from provider's platform)
-3. Test connection
+1. Choose a provider (Default / Tavily / Baidu)
+2. Enter its API key — the field links to the provider's console
+3. Test connection (uses the key you just typed, no need to save first)
 4. Save — takes effect immediately, no restart needed
 
 ### Provider Switching
 
-Switching providers is instant. The plugin disposes the old provider and registers the new one on save.
+Switching providers is instant. On save the plugin disposes the old provider,
+registers the new one, and repoints the `web` seam's `searchProvider` pin at it.
+
+That last step is required, not cosmetic: the seam resolves the pin before it
+considers any provider's availability, so a pin left behind makes every later
+switch fail with `configured web provider "<id>" is not registered`. The plugin
+writes the pin through the config's volatile reference, which changes it for the
+running session only — selection itself is persisted in `user-config.json`, and
+the two realign on the next start.
 
 ### Fallback to DeepSeek
 
-When `activeProvider` is set to `none`, no custom provider is registered, and DSH falls back to its built-in DeepSeek web search.
+Pick **Default** and no custom provider is registered, so DSH uses its built-in
+web search.
 
 ### Usage Tracking
 
-The plugin tracks monthly API calls per provider and displays usage in the settings panel. Data is persisted to `usage.json` in the plugin's data directory.
+The plugin tracks monthly API calls per provider and displays usage in the
+settings panel. Data is persisted to `usage.json` in the plugin's data
+directory.
 
 ## API Reference
 
@@ -85,7 +105,28 @@ The plugin tracks monthly API calls per provider and displays usage in the setti
 - **Endpoint**: `https://qianfan.baidubce.com/v2/ai_search/web_search`
 - **Auth**: `Authorization: Bearer <API Key>`
 - **Docs**: [cloud.baidu.com](https://cloud.baidu.com/doc/qianfan-api/s/Wmbq4z7e5)
-- **Config**: `apiKey`, `maxResults`, `timeoutMs`
+- **Config**: `apiKey`, `maxResults`, `timeoutMs` (the endpoint is fixed)
+
+## Localization
+
+The plugin ships Chinese and English. The bundle title and description come from
+`locale/zh.json` and `locale/en.json`; every string in the settings panel is
+routed through the client locale service and follows the interface language.
+
+## Styling
+
+Panel controls are hand-written against DSH's theme tokens (`--dsw-alias-*`,
+`--dsw-radius-*`) rather than imported from Harness client packages, which are
+not a stable dependency for third-party plugins. Colours come from tokens only,
+so a renamed token degrades appearance instead of breaking rendering.
+
+Two constraints worth knowing if you extend the panel:
+
+- The native `<select>` popup is drawn by the OS, so its option hover colour
+  cannot be themed. The provider picker is a `button` + listbox for that reason.
+- The provider icon reproduces the built-in Web Search artwork. DSH fills its
+  ring with a `foreignObject` conic-gradient, which renders blank once the icon
+  loads as an `<img>`, so `icon.svg` carries the same four arcs as solid colours.
 
 ## Web API
 

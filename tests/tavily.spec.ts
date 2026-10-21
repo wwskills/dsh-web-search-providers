@@ -1,9 +1,11 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
 import { TavilySearchProvider, TAVILY_PROVIDER_ID } from '../src/tavily.js'
+import type { TavilyOptions } from '../src/tavily.js'
 import { WebError, WEB_ABORTED, WEB_PROVIDER_CREDENTIAL_MISSING, WEB_PROVIDER_ERROR } from '../src/types.js'
+import type { WebSearchProvider } from '../src/types.js'
 
-const noKey = () => ({ apiKey: '' })
-const withKey = () => ({
+const noKey = (): TavilyOptions => ({ apiKey: '' })
+const withKey = (): TavilyOptions => ({
   apiKey: 'tvly-test-key',
   baseURL: 'https://api.tavily.com',
   maxResults: 5,
@@ -13,6 +15,16 @@ const withKey = () => ({
 
 function mockFetch(status: number, body: unknown): void {
   vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(body), { status })))
+}
+
+/** Await a rejecting provider call and return the thrown `WebError`. */
+async function expectWebError(provider: WebSearchProvider, query: string): Promise<WebError> {
+  const error = await provider.search({ query }).then(
+    () => undefined,
+    (e: unknown) => e,
+  )
+  expect(error).toBeInstanceOf(WebError)
+  return error as WebError
 }
 
 describe('TavilySearchProvider', () => {
@@ -72,9 +84,7 @@ describe('TavilySearchProvider', () => {
 
   it('classifies a non-OK response as provider error with status', async () => {
     mockFetch(429, 'rate limited')
-    const provider = new TavilySearchProvider(withKey)
-    const error = await provider.search({ query: 'x' }).catch(e => e as WebError)
-    expect(error).toBeInstanceOf(WebError)
+    const error = await expectWebError(new TavilySearchProvider(withKey), 'x')
     expect(error.code).toBe(WEB_PROVIDER_ERROR)
     expect(error.message).toContain('HTTP 429')
   })
@@ -83,8 +93,7 @@ describe('TavilySearchProvider', () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw Object.assign(new Error('aborted'), { name: 'AbortError' })
     }))
-    const provider = new TavilySearchProvider(withKey)
-    const error = await provider.search({ query: 'x' }).catch(e => e as WebError)
+    const error = await expectWebError(new TavilySearchProvider(withKey), 'x')
     expect(error.code).toBe(WEB_ABORTED)
   })
 
@@ -92,7 +101,7 @@ describe('TavilySearchProvider', () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('socket hang up')
     }))
-    const error = await new TavilySearchProvider(withKey).search({ query: 'x' }).catch(e => e as WebError)
+    const error = await expectWebError(new TavilySearchProvider(withKey), 'x')
     expect(error.code).toBe(WEB_PROVIDER_ERROR)
     expect(error.message).toContain('socket hang up')
   })
