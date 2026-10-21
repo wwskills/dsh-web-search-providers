@@ -198,6 +198,14 @@ function registerWithWeb(ctx: any, instance: any, providerId: string): void {
     debug(`registering ${providerId} via ${via}; web=${typeof target?.web}`)
     disposer = target.web.registerSearchProvider(instance)
     debug(`registered OK: ${providerId} (via ${via})`)
+    // Pin here rather than after registration returns: `ctx.get('web')` is
+    // undefined until the seam is mounted, but inside this callback it is live.
+    console.log(
+      syncPin(target.web, providerId)
+        ? `[web-search-providers] activated "${providerId}" and pinned the web seam to it.`
+        : `[web-search-providers] activated "${providerId}", but the web seam pin still points elsewhere; ` +
+          `web_search keeps using the pinned provider until the web row's searchProvider matches.`,
+    )
   }
 
   if (typeof ctx?.inject === 'function') {
@@ -243,7 +251,9 @@ function registerRoutes(ctx: any, base: PluginConfig, reactivate: () => void): v
         try {
           if (req.method === 'GET') return send(res, 200, effectiveConfig(base))
           const patch = (await readBody(req)) as Partial<PluginConfig>
-          persistConfig(effectiveConfig({ ...base, ...patch }))
+          // Merge row base with the panel's patch WITHOUT re-reading
+          // the old persisted config, which would undo provider/key changes.
+          persistConfig({ ...base, ...patch })
           reactivate()
           return send(res, 200, { ok: true, persisted: true })
         } catch (error) {
@@ -257,9 +267,19 @@ function registerRoutes(ctx: any, base: PluginConfig, reactivate: () => void): v
       path: `${ROUTE_PREFIX}/test`,
       handler: async (req: any, res: any) => {
         try {
-          const body = (await readBody(req)) as { provider?: string }
+          const body = (await readBody(req)) as {
+            provider?: string
+            tavilyApiKey?: string
+            baiduApiKey?: string
+          }
           const provider = body.provider ?? effectiveConfig(base).activeProvider
-          const instance = createInstance(base, provider)
+          // Build a one-shot instance with keys from the request so the
+          // test reflects the panel fields, not just the persisted config.
+          const overrides: Partial<PluginConfig> = {}
+          if (body.tavilyApiKey !== undefined) overrides.tavilyApiKey = body.tavilyApiKey
+          if (body.baiduApiKey !== undefined) overrides.baiduApiKey = body.baiduApiKey
+          const testBase = { ...base, ...overrides }
+          const instance = createInstance(testBase, provider)
           if (!instance) return send(res, 200, { ok: false, error: 'Unknown provider' })
           await instance.search({ query: 'connectivity test', maxResults: 1 })
           return send(res, 200, { ok: true, status: 200 })
@@ -312,6 +332,57 @@ function registerRoutes(ctx: any, base: PluginConfig, reactivate: () => void): v
 }
 
 /**
+ * Cross-realm key of the volatile config writer. Cordis wraps volatile cells
+ * with `get()` plus this symbol-keyed setter; the symbol comes from
+ * `Symbol.for`, so it matches across the duplicated ESM/CJS copies of the
+ * schemastery build that a plugin and the Host each load.
+ */
+const VOLATILE_WRITE = Symbol.for('cosmokit.volatile.write')
+
+/**
+ * Point the web seam's pinned provider at the id this plugin just registered.
+ *
+ * The seam resolves `searchProvider` before anything else, so a pin left at the
+ * patch's default (`tavily`) makes the panel unable to switch: once another
+ * provider is activated the seam looks for an id nobody registered and fails
+ * with `configured web provider "tavily" is not registered`.
+ *
+ * `searchProvider` is volatile, so it has no ordinary `set`. The settings
+ * service is the supported writer, but it is not mounted yet while this
+ * bundle-patch row activates, so write through the volatile reference itself.
+ *
+ * @param web - the live `web` service, captured inside the `ctx.inject` callback.
+ */
+function syncPin(web: any, providerId: string): boolean {
+  try {
+    const cell = web?.config?.searchProvider
+    if (!cell) {
+      // The shape of `web` is not part of the seam's contract, so record what
+      // is actually present instead of assuming one layout.
+      const own = web ? Object.keys(web).slice(0, 24).join(',') : String(web)
+      const cfg = web?.config ? Object.keys(web.config).slice(0, 24).join(',') : 'none'
+      debug(`pin sync skipped: no searchProvider cell; web keys=[${own}]; config keys=[${cfg}]`)
+      return false
+    }
+    if (cell.get?.() === providerId) {
+      debug(`pin already "${providerId}"`)
+      return true
+    }
+    const write = cell[VOLATILE_WRITE]
+    if (typeof write !== 'function') {
+      debug('pin sync failed: no volatile writer on searchProvider')
+      return false
+    }
+    write.call(cell, providerId)
+    debug(`pinned web.searchProvider="${providerId}" -> ${String(cell.get?.())}`)
+    return cell.get?.() === providerId
+  } catch (error) {
+    debug(`pin sync failed: ${error instanceof Error ? error.message : String(error)}`)
+    return false
+  }
+}
+
+/**
  * Activate the configured provider and mount the settings API.
  * @param ctx - plugin context.
  * @param config - the row's config cells or plain values.
@@ -336,10 +407,6 @@ export function apply(ctx: any, config: any = {}): void {
     disposeCurrentProvider()
     const instance = withUsageCounter(createInstance(base))
     registerWithWeb(ctx, instance, instance.id)
-    console.log(
-      `[web-search-providers] activated "${instance.id}". If another usable provider is mounted too, ` +
-      `pin an id via the web row's searchProvider config or $DSH_WEB_SEARCH_PROVIDER.`,
-    )
   }
 
   reactivate()
