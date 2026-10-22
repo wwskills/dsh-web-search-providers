@@ -72,15 +72,29 @@ those directly is unsupported.
 From an agent session, ask for the bundle install:
 
 ```
+plugin_manager action=install_bundle target=@wwskills/dsh-web-search-providers
+```
+
+That pulls the published package from npm. Both host and browser code load on
+the next DSH start, so restart afterwards to see the panel.
+
+### From a Git checkout
+
+To follow development instead of the registry, clone the repository and point
+the same action at the checkout:
+
+```bash
+git clone https://github.com/wwskills/dsh-web-search-providers.git
+```
+
+```
 plugin_manager action=install_bundle target=D:\path\to\dsh-web-search-providers
 ```
 
-`install_bundle` performs the package installation and records the bundle
-selection. An agent can also pass `target=@wwskills/dsh-web-search-providers` once
-the package is published to a registry your profile can reach.
-
-Both host and browser code load on the next DSH start, so restart afterwards to
-see the panel.
+A directory target is recorded as a link, so Plugin Manager shows the checkout
+path as the install source and your edits are picked up after a rebuild
+(`npm run build`) and restart. This is the development flow; end users should
+install from npm.
 
 ## Configuration
 

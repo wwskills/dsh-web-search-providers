@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.4.0] - 2026-10-21
+## [0.4.0] - 2026-10-22
 
 ### Changed
 
@@ -149,3 +149,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - WebUI settings tab: Web Search
 - DSH settings namespace registration
 - Web API: GET/POST /plugins/web-search-providers/api/config
+
+[0.4.0]: https://github.com/wwskills/dsh-web-search-providers/releases/tag/v0.4.0
+[0.3.0]: https://github.com/wwskills/dsh-web-search-providers/releases/tag/v0.3.0
+[0.1.0]: https://github.com/wwskills/dsh-web-search-providers/releases/tag/v0.1.0
