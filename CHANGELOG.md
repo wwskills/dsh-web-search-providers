@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Short-name npm variant**: `npm run build:short` assembles `dist-short/` —
+  the same plugin published under the unscoped npm name
+  `dsh-web-search-providers`, so installs can type the name without the scope.
+  The build swaps every identity-bearing spot (package name, loader row name,
+  client module-table id, settings-panel slot key) to the short name; the host
+  bundle is byte-identical to the scoped build. Published as
+  `dsh-web-search-providers@0.4.0`. Both names carry the same code — install
+  one, not both (two installs register duplicate search providers).
+  Note: npm creates a transient `0.0.0-stage` placeholder version while
+  processing a brand-new package; it is server-side, harmless, and remains in
+  the version list.
+
 ## [0.4.0] - 2026-10-22
 
 ### Changed

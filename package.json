@@ -24,6 +24,7 @@
   },
   "scripts": {
     "build": "node build.mjs",
+    "build:short": "npm run build && node scripts/build-short.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check": "npm run typecheck && npm run test && npm run build"

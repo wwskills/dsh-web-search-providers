@@ -1,1 +1,3 @@
 node_modules/
+dist-short/
+src/.client-short.tmp.tsx

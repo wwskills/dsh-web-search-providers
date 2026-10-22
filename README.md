@@ -75,6 +75,17 @@ From an agent session, ask for the bundle install:
 plugin_manager action=install_bundle target=@wwskills/dsh-web-search-providers
 ```
 
+The same plugin is also published under the unscoped short name, for installs
+that prefer typing it without the scope:
+
+```
+plugin_manager action=install_bundle target=dsh-web-search-providers
+```
+
+Both names carry identical code and share the same data directory (API keys,
+usage). Install either one — but only one: two installs would register
+duplicate search providers.
+
 That pulls the published package from npm. Both host and browser code load on
 the next DSH start, so restart afterwards to see the panel.
 
