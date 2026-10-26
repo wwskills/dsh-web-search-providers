@@ -3,9 +3,10 @@
 Web search providers for [DeepSeek Harness](https://github.com/deepseek-ai/dsh).
 Provides alternative search engines for DSH's built-in `web_search` tool.
 
-Built and verified against **DSH 0.2.1-rc.2**. The package declares that version
-in `engines.dsh`, which is the field DSH checks before importing plugin code, so
-an incompatible host refuses the install instead of misbehaving silently.
+Built against **DSH 0.2.1-rc.2** and verified compatible with **0.2.1-rc.3**.
+`engines.dsh` declares the range `>=0.2.1-rc.2 <0.3.0`, which is the field DSH
+checks before importing plugin code, so a host outside that range refuses the
+install instead of misbehaving silently.
 
 DSH evaluates `engines.dsh` first; when it is present the `@deepseek-ai/dsh-*`
 peer ranges are ignored for compatibility purposes. The peer on
@@ -30,7 +31,7 @@ notice — check the provider's dashboard for current allowances.
 
 | Requirement | Value |
 |-------------|-------|
-| DSH | `0.2.1-rc.2` (declared in `engines.dsh`) |
+| DSH | `>=0.2.1-rc.2 <0.3.0` (declared in `engines.dsh`; verified 0.2.1-rc.2 – 0.2.1-rc.3) |
 | Node.js | `>=24` (declared in `engines.node`) |
 
 DSH checks `engines.dsh` against the version reported by `dsh --version` before

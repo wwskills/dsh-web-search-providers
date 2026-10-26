@@ -1,11 +1,11 @@
 {
   "name": "@wwskills/dsh-web-search-providers",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Web search providers for DSH: Tavily + Baidu + extensible",
   "icon": "icon.svg",
   "engines": {
     "node": ">=24",
-    "dsh": "0.2.1-rc.2"
+    "dsh": ">=0.2.1-rc.2 <0.3.0"
   },
   "type": "module",
   "main": "lib/index.js",
@@ -34,7 +34,7 @@
   "author": "wwskills",
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.0.5",
-    "@deepseek-ai/dsh-web": "0.2.1-rc.2"
+    "@deepseek-ai/dsh-web": ">=0.2.1-rc.2 <0.3.0"
   },
   "dependencies": {
     "@deepseek-ai/schemastery": "~3.18.5"

@@ -7,19 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [0.4.1] - 2026-10-26
 
-- **Short-name npm variant**: `npm run build:short` assembles `dist-short/` —
-  the same plugin published under the unscoped npm name
-  `dsh-web-search-providers`, so installs can type the name without the scope.
-  The build swaps every identity-bearing spot (package name, loader row name,
-  client module-table id, settings-panel slot key) to the short name; the host
-  bundle is byte-identical to the scoped build. Published as
-  `dsh-web-search-providers@0.4.0`. Both names carry the same code — install
-  one, not both (two installs register duplicate search providers).
-  Note: npm creates a transient `0.0.0-stage` placeholder version while
-  processing a brand-new package; it is server-side, harmless, and remains in
-  the version list.
+### Changed
+
+- **DSH 0.2.1-rc.3 compatibility.** `engines.dsh` widened from the exact
+  prerelease pin `0.2.1-rc.2` to `>=0.2.1-rc.2 <0.3.0`, so a DSH 0.2.1-rc.3
+  host accepts the plugin again. An exact prerelease matches only that one
+  release, which made DSH 0.2.1-rc.3 refuse every install of 0.4.0 with an
+  `incompatible-version` error; the range accepts rc.3 and later 0.2.x
+  prereleases and patches. The `@deepseek-ai/dsh-web` peer range widened to
+  match. No code changes — host and client bundles are identical to 0.4.0,
+  and the DSH rc.2→rc.3 release touched no seam this plugin uses.
 
 ## [0.4.0] - 2026-10-22
 
@@ -53,6 +52,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its ring with a `foreignObject` conic-gradient, which renders blank when the
   icon loads as an `<img>`, so the four arcs carry the equivalent solid colours.
 - API-key guidance links under each provider's field.
+- **Short-name npm variant**: `npm run build:short` assembles `dist-short/` —
+  the same plugin published under the unscoped npm name
+  `dsh-web-search-providers`, so installs can type the name without the scope.
+  The build swaps every identity-bearing spot (package name, loader row name,
+  client module-table id, settings-panel slot key) to the short name; the host
+  bundle is byte-identical to the scoped build. Published as
+  `dsh-web-search-providers@0.4.0`. Both names carry the same code — install
+  one, not both (two installs register duplicate search providers).
+  Note: npm creates a transient `0.0.0-stage` placeholder version while
+  processing a brand-new package; it is server-side, harmless, and remains in
+  the version list.
 
 ### Fixed
 
@@ -166,6 +176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DSH settings namespace registration
 - Web API: GET/POST /plugins/web-search-providers/api/config
 
+[0.4.1]: https://github.com/wwskills/dsh-web-search-providers/releases/tag/v0.4.1
 [0.4.0]: https://github.com/wwskills/dsh-web-search-providers/releases/tag/v0.4.0
 [0.3.0]: https://github.com/wwskills/dsh-web-search-providers/releases/tag/v0.3.0
 [0.1.0]: https://github.com/wwskills/dsh-web-search-providers/releases/tag/v0.1.0

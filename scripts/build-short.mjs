@@ -119,8 +119,8 @@ const readme = readFileSync(join(root, 'README.md'), 'utf8')
   .replace(`# ${SCOPED}`, `# ${SHORT}`)
   .replaceAll(SCOPED, SHORT)
   .replace(
-    'Built and verified against **DSH 0.2.1-rc.2**.',
-    `> Same plugin as \`${SCOPED}\`, published under both npm names. Install either one —\n> but only one: two installs register duplicate search providers.\n\nBuilt and verified against **DSH 0.2.1-rc.2**.`,
+    'Built against **DSH 0.2.1-rc.2** and verified compatible with **0.2.1-rc.3**.',
+    `> Same plugin as \`${SCOPED}\`, published under both npm names. Install either one —\n> but only one: two installs register duplicate search providers.\n\nBuilt against **DSH 0.2.1-rc.2** and verified compatible with **0.2.1-rc.3**.`,
   )
 writeFileSync(join(out, 'README.md'), readme)
 
